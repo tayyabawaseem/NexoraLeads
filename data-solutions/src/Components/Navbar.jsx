@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { FaBars, FaTimes, FaWhatsapp } from "react-icons/fa";
+import { FaBars, FaXmark } from "react-icons/fa6";
 import logo from "../assets/img/logo-removebg-preview.png";
-import WhatsAppBtn from "./WhatsAppButton/WhatsappBtn";
-
+import WhatsAppBtn from "./WhatsAppButton/WhatsAppBtn";
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [showNavbar, setShowNavbar] = useState(true);
@@ -65,7 +64,7 @@ function Navbar() {
           className="close-btn"
           onClick={() => setMenuOpen(false)}
         >
-            <FaTimes />
+            <FaXmark />
         </div>
 
         <a href="/" onClick={() => setMenuOpen(false)}>

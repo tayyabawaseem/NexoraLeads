@@ -1,5 +1,5 @@
-import WhatsAppBtn from "./WhatsAppButton/WhatsappBtn";
-import { FaCheck, FaWhatsapp } from "react-icons/fa";
+import WhatsAppBtn from "./WhatsAppButton/WhatsAppBtn";
+import { FaCheck, FaWhatsapp } from "react-icons/fa6";
 import {
   FaBuilding,
   FaCity,
@@ -122,7 +122,7 @@ function HeroSection() {
 
       {/* ================= BUSINESS SECTION ================= */}
 
-      <section className="business-section">
+      <section className="business-section" id="about">
         <div className="business-wrapper">
           <div className="left-content">
             <h1>Why Brokers Scale Faster With Our System</h1>
