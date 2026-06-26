@@ -1526,6 +1526,7 @@ body {
       transparent 70%);
 
   filter: blur(90px);
+  pointer-events: none;
 }
 
 .reviews-section::after {
