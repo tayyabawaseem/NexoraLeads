@@ -1,12 +1,10 @@
+const mongoose = require("mongoose");
 const app = require("./app");
 const connectDB = require("./config/db");
 
-let isConnected = false;
-
 async function handler(req, res) {
-  if (!isConnected) {
+  if (mongoose.connection.readyState !== 1) {
     await connectDB();
-    isConnected = true;
   }
 
   return app(req, res);

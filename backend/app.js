@@ -7,9 +7,6 @@ const adminRoutes = require("./routes/adminRoutes");
 
 const app = express();
 
-// Connect MongoDB
-connectDB();
-
 // Middleware
 app.use(cors());
 app.use(express.json());
