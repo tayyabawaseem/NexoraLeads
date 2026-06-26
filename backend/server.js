@@ -3,20 +3,13 @@ const connectDB = require("./config/db");
 
 let isConnected = false;
 
-module.exports = async (req, res) => {
-  try {
-    if (!isConnected) {
-      await connectDB();
-      isConnected = true;
-    }
-
-    return app(req, res);
-
-  } catch (error) {
-    console.error(error);
-
-    return res.status(500).json({
-      message: "Database connection failed"
-    });
+async function handler(req, res) {
+  if (!isConnected) {
+    await connectDB();
+    isConnected = true;
   }
-};
+
+  return app(req, res);
+}
+
+module.exports = handler;
