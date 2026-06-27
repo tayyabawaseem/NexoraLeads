@@ -28,9 +28,15 @@ const Dashboard = () => {
     }
   }, [filter]);
 
-  useEffect(() => {
+ useEffect(() => {
+  fetchReviews();
+
+  const interval = setInterval(() => {
     fetchReviews();
-  }, [fetchReviews]);
+  }, 3000); // every 3 seconds
+
+  return () => clearInterval(interval);
+}, [fetchReviews]);
 
   const handleApprove = async (id) => {
     setBusyId(id);
