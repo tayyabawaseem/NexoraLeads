@@ -8,7 +8,6 @@ import ReveiwBtn from "./ReveiwBtn";
 import { getApprovedReviews } from "../../Api/reviewApi";
 
 function ReveiwSlide() {
-
   const [reviews, setReviews] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -30,31 +29,33 @@ function ReveiwSlide() {
 
   const settings = {
     dots: true,
-    infinite: true,
+    infinite: reviews.length > 3, // Agar 3 se kam reviews hain to slide block na ho
     speed: 600,
     autoplay: true,
     autoplaySpeed: 3000,
     slidesToShow: 3,
     slidesToScroll: 1,
     arrows: false,
-
     responsive: [
       {
         breakpoint: 1200,
         settings: {
           slidesToShow: 3,
+          slidesToScroll: 1,
         },
       },
       {
         breakpoint: 992,
         settings: {
           slidesToShow: 2,
+          slidesToScroll: 1,
         },
       },
       {
-        breakpoint: 768,
+        breakpoint: 768, // Mobile screens par strictly ek card show hoga
         settings: {
           slidesToShow: 1,
+          slidesToScroll: 1,
           centerMode: false,
         },
       },
@@ -63,87 +64,68 @@ function ReveiwSlide() {
 
   return (
     <>
-    <section className="reviews-section">
+      <section className="reviews-section">
+        <div className="reviews-header">
+          <span>CLIENT SUCCESS STORIES</span>
+          <h2>
+            Trusted by businesses
+            <br />
+            <strong>Proven by Results.</strong>
+          </h2>
+          <p>
+            Real feedback from professionals who use our solutions to grow faster.
+          </p>
+        </div>
 
-      <div className="reviews-header">
-        <span>CLIENT SUCCESS STORIES</span>
+        {/* Loading State */}
+        {isLoading && (
+          <p style={{ textAlign: "center", color: "#64748b", padding: "40px 0" }}>
+            Loading reviews...
+          </p>
+        )}
 
-        <h2>
-          Trusted by businesses
-          <br />
-          <strong>Proven by Results.</strong>
-        </h2>
+        {/* Error State */}
+        {!isLoading && fetchError && (
+          <p style={{ textAlign: "center", color: "#ef4444", padding: "40px 0" }}>
+            {fetchError}
+          </p>
+        )}
 
-        <p>
-          Real feedback from professionals who use our solutions
-          to grow faster.
-        </p>
-      </div>
+        {/* Empty State */}
+        {!isLoading && !fetchError && reviews.length === 0 && (
+          <p style={{ textAlign: "center", color: "#64748b", padding: "40px 0" }}>
+            No reviews yet. Be the first to share your experience!
+          </p>
+        )}
 
-      {/* Loading State */}
-      {isLoading && (
-        <p style={{ textAlign: "center", color: "#64748b", padding: "40px 0" }}>
-          Loading reviews...
-        </p>
-      )}
-
-      {/* Error State */}
-      {!isLoading && fetchError && (
-        <p style={{ textAlign: "center", color: "#ef4444", padding: "40px 0" }}>
-          {fetchError}
-        </p>
-      )}
-
-      {/* Empty State */}
-      {!isLoading && !fetchError && reviews.length === 0 && (
-        <p style={{ textAlign: "center", color: "#64748b", padding: "40px 0" }}>
-          No reviews yet. Be the first to share your experience!
-        </p>
-      )}
-
-      {/* Slider — only renders when there are reviews */}
-      {!isLoading && !fetchError && reviews.length > 0 && (
-        <Slider {...settings} className="reviews-slider">
-
-          {reviews.map((item, index) => (
-            <div key={item._id || index} className="slide-wrapper">
-
-              <div className="review-card">
-
-                <div className="stars">
-                  {[...Array(item.rating)].map((_, i) => (
-                    <FaStar key={i} />
-                  ))}
-                </div>
-
-                <p className="review-text">
-                  "{item.review}"
-                </p>
-
-                <div className="client-info">
-
-                  <div className="avatar">
-                    {item.name.charAt(0)}
+        {/* Slider — only renders when there are reviews */}
+        {!isLoading && !fetchError && reviews.length > 0 && (
+          <Slider {...settings} className="reviews-slider">
+            {reviews.map((item, index) => (
+              <div key={item._id || index} className="slide-wrapper">
+                <div className="review-card">
+                  <div className="stars">
+                    {[...Array(item.rating || 5)].map((_, i) => (
+                      <FaStar key={i} />
+                    ))}
                   </div>
 
-                  <div>
-                    <h4>{item.name}</h4>
-                    {/* <span>{item.role}</span> */}
+                  <p className="review-text">"{item.review}"</p>
+
+                  <div className="client-info">
+                    <div className="avatar">{item.name ? item.name.charAt(0) : "U"}</div>
+                    <div>
+                      <h4>{item.name || "Anonymous"}</h4>
+                    </div>
                   </div>
-
                 </div>
-
               </div>
+            ))}
+          </Slider>
+        )}
 
-            </div>
-          ))}
-
-        </Slider>
-      )}
-
-      <ReveiwBtn />
-    </section>
-
+        <ReveiwBtn />
+      </section>
     </>
   );
 }
