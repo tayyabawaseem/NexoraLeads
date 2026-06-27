@@ -42,7 +42,7 @@ const Dashboard = () => {
     } catch (err) {
       setError("Could not approve review. Please try again.");
     } finally {
-      setBusyId(null);
+      setLoading(null);
     }
   };
 
@@ -56,7 +56,7 @@ const Dashboard = () => {
     } catch (err) {
       setError("Could not reject review. Please try again.");
     } finally {
-      setBusyId(null);
+      setLoading(null);
     }
   };
 
@@ -71,8 +71,15 @@ const Dashboard = () => {
     } catch (err) {
       setError("Could not delete review. Please try again.");
     } finally {
-      setBusyId(null);
+      setLoading(null);
     }
+  };
+
+  // Helper to format date cleanly
+  const formatDate = (dateString) => {
+    if (!dateString) return "";
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
   return (
@@ -105,19 +112,88 @@ const Dashboard = () => {
 
         {error && <div className="error-banner">{error}</div>}
 
-        <div className="table-card">
-          {loading ? (
-            <div className="loading-state">Loading reviews...</div>
-          ) : (
-            <ReviewTable
-              reviews={reviews}
-              onApprove={handleApprove}
-              onReject={handleReject}
-              onDelete={handleDelete}
-              busyId={busyId}
-            />
-          )}
-        </div>
+        {loading ? (
+          <div className="loading-state">Loading reviews...</div>
+        ) : reviews.length === 0 ? (
+          <div className="empty-state">
+            <h3>No Reviews Found</h3>
+            <p>No customer submissions match this filter status.</p>
+          </div>
+        ) : (
+          <>
+            {/* 1. Desktop View Layout (CSS takes care of hiding this on mobile) */}
+            <div className="table-card">
+              <ReviewTable
+                reviews={reviews}
+                onApprove={handleApprove}
+                onReject={handleReject}
+                onDelete={handleDelete}
+                busyId={busyId}
+              />
+            </div>
+
+            {/* 2. Mobile Cards Grid View (CSS takes care of showing this on mobile) */}
+            <div className="mobile-reviews-grid">
+              {reviews.map((review) => (
+                <div key={review._id} className="review-mobile-card">
+                  {/* Header: Avatar, Name and Rating */}
+                  <div className="mobile-card-header">
+                    <div className="reviewer-info">
+                      <div className="reviewer-avatar">
+                        {review.name ? review.name.charAt(0).toUpperCase() : "U"}
+                      </div>
+                      <div>
+                        <div className="reviewer-name">{review.name || "Anonymous"}</div>
+                        <div className="reviewer-id">#{review._id?.slice(-4)}</div>
+                      </div>
+                    </div>
+                    <div className="rating-stars">
+                      {"★".repeat(review.rating || 5)}
+                    </div>
+                  </div>
+
+                  {/* Body: Review Text Content */}
+                  <div className="mobile-card-body">
+                    <div className="review-text">{review.comment || review.text}</div>
+                  </div>
+
+                  {/* Meta: Clean Date Hierarchy & Glassmorphic Status */}
+                  <div className="mobile-card-meta">
+                    <div className="date-cell">{formatDate(review.createdAt)}</div>
+                    <span className={`badge ${review.status || "pending"}`}>
+                      {review.status || "pending"}
+                    </span>
+                  </div>
+
+                  {/* Actions Area: Direct Control Pipeline */}
+                  <div className="mobile-card-actions">
+                    <button
+                      className="action-btn approve"
+                      disabled={busyId === review._id || review.status === "approved"}
+                      onClick={() => handleApprove(review._id)}
+                    >
+                      {busyId === review._id ? "..." : "Approve"}
+                    </button>
+                    <button
+                      className="action-btn reject"
+                      disabled={busyId === review._id || review.status === "rejected"}
+                      onClick={() => handleReject(review._id)}
+                    >
+                      {busyId === review._id ? "..." : "Reject"}
+                    </button>
+                    <button
+                      className="action-btn delete"
+                      disabled={busyId === review._id}
+                      onClick={() => handleDelete(review._id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </main>
     </div>
   );
