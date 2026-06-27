@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import api from "../api/axios.js";
 import { useAuth } from "../context/AuthContext.jsx";
 import ReviewTable from "../components/ReviewTable.jsx";
@@ -14,13 +14,27 @@ const Dashboard = () => {
 
   const { admin, logout } = useAuth();
 
-  const fetchReviews = useCallback(async () => {
-    setLoading(true);
-    setError("");
+  // Stores latest updatedAt from server
+  const lastUpdatedRef = useRef(null);
+
+  // Fetch reviews
+  const fetchReviews = useCallback(async (isSilent = false) => {
     try {
+      if (!isSilent) setLoading(true);
+
       const params = filter !== "all" ? { status: filter } : {};
       const response = await api.get("/admin/reviews", { params });
+
       setReviews(response.data.data);
+
+      // FIX 1: Sync the ref with the freshest data from the database
+      if (response.data.data.length > 0) {
+        lastUpdatedRef.current = response.data.data[0].updatedAt;
+      } else {
+        lastUpdatedRef.current = null;
+      }
+
+      setError("");
     } catch (err) {
       setError("Could not load reviews. Please try again.");
     } finally {
@@ -28,22 +42,40 @@ const Dashboard = () => {
     }
   }, [filter]);
 
- useEffect(() => {
-  fetchReviews();
+  useEffect(() => {
+    // Initial Load (Show loading UI)
+    fetchReviews(false);
 
-  const interval = setInterval(() => {
-    fetchReviews();
-  }, 3000); // every 3 seconds
+    // Setup short-polling interval
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get("/admin/reviews/last-updated");
+        const serverLastUpdated = res.data.lastUpdated;
 
-  return () => clearInterval(interval);
-}, [fetchReviews]);
+        // FIX 2: Check if server timestamp differs from what we currently have
+        if (serverLastUpdated !== lastUpdatedRef.current) {
+          // Fetch silently in background without resetting UI loaders
+          await fetchReviews(true);
+          // Keep the ref updated in case filter changes didn't rewrite it
+          lastUpdatedRef.current = serverLastUpdated;
+        }
+      } catch (err) {
+        console.error("Polling error:", err);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [fetchReviews]);
 
   const handleApprove = async (id) => {
     setBusyId(id);
     try {
       await api.put(`/admin/reviews/${id}/approve`);
+
       setReviews((prev) =>
-        prev.map((r) => (r._id === id ? { ...r, status: "approved" } : r))
+        prev.map((r) =>
+          r._id === id ? { ...r, status: "approved" } : r
+        )
       );
     } catch (err) {
       setError("Could not approve review. Please try again.");
@@ -56,8 +88,11 @@ const Dashboard = () => {
     setBusyId(id);
     try {
       await api.put(`/admin/reviews/${id}/reject`);
+
       setReviews((prev) =>
-        prev.map((r) => (r._id === id ? { ...r, status: "rejected" } : r))
+        prev.map((r) =>
+          r._id === id ? { ...r, status: "rejected" } : r
+        )
       );
     } catch (err) {
       setError("Could not reject review. Please try again.");
@@ -70,9 +105,12 @@ const Dashboard = () => {
     if (!window.confirm("Delete this review permanently? This cannot be undone.")) {
       return;
     }
+
     setBusyId(id);
+
     try {
       await api.delete(`/admin/reviews/${id}`);
+
       setReviews((prev) => prev.filter((r) => r._id !== id));
     } catch (err) {
       setError("Could not delete review. Please try again.");
@@ -84,14 +122,16 @@ const Dashboard = () => {
   // Helper to format date safely
   const formatDate = (review) => {
     const dateSource = review.createdAt || review.date || review.updatedAt;
+
     if (!dateSource) return "Recent";
+
     try {
       return new Date(dateSource).toLocaleDateString(undefined, {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
-    } catch (e) {
+    } catch {
       return "Recent";
     }
   };
@@ -149,7 +189,6 @@ const Dashboard = () => {
             {/* 2. Mobile Cards Grid View */}
             <div className="mobile-reviews-grid">
               {reviews.map((review) => {
-                // Dynamic debugging directly on mobile UI safe guard
                 const reviewContent = review.comment || review.text || review.review || review.message || "No content provided";
                 const reviewerName = review.name || review.username || review.reviewer || "Anonymous";
                 

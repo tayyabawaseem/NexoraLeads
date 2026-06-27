@@ -19,13 +19,14 @@ const submitReview = async (req, res) => {
       data: newReview,
     });
   } catch (error) {
-    // Mongoose validation errors (min length, required fields, rating range)
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map((err) => err.message);
       return res.status(400).json({ message: messages.join(", ") });
     }
 
-    return res.status(500).json({ message: "Server error while submitting review" });
+    return res.status(500).json({
+      message: "Server error while submitting review",
+    });
   }
 };
 
@@ -34,26 +35,53 @@ const submitReview = async (req, res) => {
 // @access  Public
 const getApprovedReviews = async (req, res) => {
   try {
-    const reviews = await Review.find({ status: "approved" }).sort({ createdAt: -1 });
+    const reviews = await Review.find({ status: "approved" }).sort({
+      createdAt: -1,
+    });
+
     return res.status(200).json({ data: reviews });
   } catch (error) {
-    return res.status(500).json({ message: "Server error while fetching reviews" });
+    return res.status(500).json({
+      message: "Server error while fetching reviews",
+    });
   }
 };
 
 // @route   GET /api/admin/reviews
-// @desc    Get all reviews regardless of status (pending, approved, rejected)
+// @desc    Get all reviews regardless of status
 // @access  Private (admin)
 const getAllReviews = async (req, res) => {
   try {
-    const { status } = req.query; // optional filter: ?status=pending
+    const { status } = req.query;
 
     const filter = status ? { status } : {};
     const reviews = await Review.find(filter).sort({ createdAt: -1 });
 
     return res.status(200).json({ data: reviews });
   } catch (error) {
-    return res.status(500).json({ message: "Server error while fetching reviews" });
+    return res.status(500).json({
+      message: "Server error while fetching reviews",
+    });
+  }
+};
+
+// ===============================
+// NEW API
+// @route GET /api/admin/reviews/last-updated
+// ===============================
+const getLastReviewUpdate = async (req, res) => {
+  try {
+    const latestReview = await Review.findOne().sort({
+      updatedAt: -1,
+    });
+
+    return res.status(200).json({
+      lastUpdated: latestReview ? latestReview.updatedAt : null,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: "Server error while checking updates",
+    });
   }
 };
 
@@ -69,12 +97,19 @@ const approveReview = async (req, res) => {
     );
 
     if (!review) {
-      return res.status(404).json({ message: "Review not found" });
+      return res.status(404).json({
+        message: "Review not found",
+      });
     }
 
-    return res.status(200).json({ message: "Review approved", data: review });
+    return res.status(200).json({
+      message: "Review approved",
+      data: review,
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Server error while approving review" });
+    return res.status(500).json({
+      message: "Server error while approving review",
+    });
   }
 };
 
@@ -90,12 +125,19 @@ const rejectReview = async (req, res) => {
     );
 
     if (!review) {
-      return res.status(404).json({ message: "Review not found" });
+      return res.status(404).json({
+        message: "Review not found",
+      });
     }
 
-    return res.status(200).json({ message: "Review rejected", data: review });
+    return res.status(200).json({
+      message: "Review rejected",
+      data: review,
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Server error while rejecting review" });
+    return res.status(500).json({
+      message: "Server error while rejecting review",
+    });
   }
 };
 
@@ -107,12 +149,18 @@ const deleteReview = async (req, res) => {
     const review = await Review.findByIdAndDelete(req.params.id);
 
     if (!review) {
-      return res.status(404).json({ message: "Review not found" });
+      return res.status(404).json({
+        message: "Review not found",
+      });
     }
 
-    return res.status(200).json({ message: "Review deleted" });
+    return res.status(200).json({
+      message: "Review deleted",
+    });
   } catch (error) {
-    return res.status(500).json({ message: "Server error while deleting review" });
+    return res.status(500).json({
+      message: "Server error while deleting review",
+    });
   }
 };
 
@@ -120,6 +168,7 @@ module.exports = {
   submitReview,
   getApprovedReviews,
   getAllReviews,
+  getLastReviewUpdate, // 👈 NEW
   approveReview,
   rejectReview,
   deleteReview,
