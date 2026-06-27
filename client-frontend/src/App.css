@@ -885,7 +885,7 @@ body {
   position: relative;
   padding: 110px 6% 86px;
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: hidden;
   background: linear-gradient(180deg, #ffffff 0%, #faf8f4 50%, #f7f8ff 100%);
 }
 
@@ -941,7 +941,9 @@ body {
   font-size: clamp(30px, 4.6vw, 50px);
   line-height: 1.1;
   font-weight: 800;
-  color: var(--secondary);
+    background: var(--btn-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .reviews-header h2 strong {
