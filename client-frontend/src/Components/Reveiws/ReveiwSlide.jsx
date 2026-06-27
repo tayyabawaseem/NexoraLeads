@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import Slider from "react-slick";
 import { FaStar } from "react-icons/fa6";
 import "slick-carousel/slick/slick.css";
@@ -8,8 +8,6 @@ import ReveiwBtn from "./ReveiwBtn";
 import { getApprovedReviews } from "../../Api/reviewApi";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-
-const WORD_THRESHOLD = 55;
 
 const SLIDER_SETTINGS = {
   dots: true,
@@ -49,26 +47,78 @@ function StarRating({ count = 5 }) {
 
 function ReviewCard({ item }) {
   const [expanded, setExpanded] = useState(false);
-
-  const isLong = useMemo(
-    () => (item.review || "").split(" ").length > WORD_THRESHOLD,
-    [item.review]
-  );
+  const [needsReadMore, setNeedsReadMore] = useState(false);
+  const textRef = useRef(null);
+  const review = item.review || "";
 
   const toggle = useCallback(() => setExpanded((v) => !v), []);
 
   const initial = item.name ? item.name.charAt(0).toUpperCase() : "U";
 
+  useEffect(() => {
+    const textElement = textRef.current;
+
+    if (!textElement) return undefined;
+
+    let animationFrameId;
+
+    const measureOverflow = () => {
+      cancelAnimationFrame(animationFrameId);
+
+      animationFrameId = requestAnimationFrame(() => {
+        const reviewBody = textElement.parentElement;
+        const wasExpanded = reviewBody?.classList.contains("is-expanded");
+        const wasCollapsed = textElement.classList.contains("collapsed");
+
+        if (wasExpanded) reviewBody.classList.remove("is-expanded");
+        if (!wasCollapsed) textElement.classList.add("collapsed");
+
+        const hasOverflow =
+          textElement.scrollHeight > textElement.clientHeight + 1;
+
+        if (!wasCollapsed) textElement.classList.remove("collapsed");
+        if (wasExpanded) reviewBody.classList.add("is-expanded");
+
+        setNeedsReadMore(hasOverflow);
+
+        if (!hasOverflow) setExpanded(false);
+      });
+    };
+
+    setExpanded(false);
+    measureOverflow();
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(measureOverflow)
+        : null;
+
+    resizeObserver?.observe(textElement);
+
+    document.fonts?.ready.then(measureOverflow);
+
+    window.addEventListener("resize", measureOverflow);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", measureOverflow);
+    };
+  }, [review]);
+
   return (
     <div className="review-card">
       <StarRating count={item.rating || 5} />
 
-      <div className="review-body">
-        <p className={`review-text${isLong && !expanded ? " collapsed" : ""}`}>
-          "{item.review}"
+      <div className={`review-body${expanded ? " is-expanded" : ""}`}>
+        <p
+          ref={textRef}
+          className={`review-text${!expanded ? " collapsed" : ""}`}
+        >
+          "{review}"
         </p>
 
-        {isLong && (
+        {needsReadMore && (
           <button
             className={`read-more-btn${expanded ? " open" : ""}`}
             onClick={toggle}
