@@ -884,7 +884,8 @@ body {
 .reviews-section {
   position: relative;
   padding: 110px 6% 86px;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
   background: linear-gradient(180deg, #ffffff 0%, #faf8f4 50%, #f7f8ff 100%);
 }
 
@@ -1049,6 +1050,7 @@ body {
 }
 
 .review-body {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
@@ -1075,10 +1077,25 @@ body {
   overflow: hidden;
 }
 
+.review-text-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: -1;
+}
+
 .review-body.is-expanded .review-text {
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(200, 150, 95, .55) rgba(15, 23, 42, .06);
+}
+
+.review-body.is-expanded .review-text-measure {
+  display: -webkit-box;
+  overflow: hidden;
 }
 
 .review-body.is-expanded .review-text::-webkit-scrollbar {
@@ -1178,6 +1195,11 @@ body {
   line-height: 1.35;
   color: var(--rv-role);
   font-weight: 400;
+}
+
+.reviews-section .reviews-sections {
+  position: relative;
+  z-index: 3;
 }
 
 /* ==========================================================================

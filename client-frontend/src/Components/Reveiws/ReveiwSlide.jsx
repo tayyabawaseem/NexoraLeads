@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import Slider from "react-slick";
 import { FaStar } from "react-icons/fa6";
 import "slick-carousel/slick/slick.css";
@@ -48,72 +55,53 @@ function StarRating({ count = 5 }) {
 function ReviewCard({ item }) {
   const [expanded, setExpanded] = useState(false);
   const [needsReadMore, setNeedsReadMore] = useState(false);
-  const textRef = useRef(null);
+  const measureRef = useRef(null);
   const review = item.review || "";
 
   const toggle = useCallback(() => setExpanded((v) => !v), []);
 
   const initial = item.name ? item.name.charAt(0).toUpperCase() : "U";
 
-  useEffect(() => {
-    const textElement = textRef.current;
+  const measureOverflow = useCallback(() => {
+    const measureElement = measureRef.current;
 
-    if (!textElement) return undefined;
+    if (!measureElement) return;
 
-    let animationFrameId;
+    const hasOverflow =
+      measureElement.scrollHeight > measureElement.clientHeight + 1;
 
-    const measureOverflow = () => {
-      cancelAnimationFrame(animationFrameId);
+    setNeedsReadMore(hasOverflow);
 
-      animationFrameId = requestAnimationFrame(() => {
-        const reviewBody = textElement.parentElement;
-        const wasExpanded = reviewBody?.classList.contains("is-expanded");
-        const wasCollapsed = textElement.classList.contains("collapsed");
+    if (!hasOverflow) {
+      setExpanded(false);
+    }
+  }, []);
 
-        if (wasExpanded) reviewBody.classList.remove("is-expanded");
-        if (!wasCollapsed) textElement.classList.add("collapsed");
-
-        const hasOverflow =
-          textElement.scrollHeight > textElement.clientHeight + 1;
-
-        if (!wasCollapsed) textElement.classList.remove("collapsed");
-        if (wasExpanded) reviewBody.classList.add("is-expanded");
-
-        setNeedsReadMore(hasOverflow);
-
-        if (!hasOverflow) setExpanded(false);
-      });
-    };
-
+  useLayoutEffect(() => {
     setExpanded(false);
     measureOverflow();
+  }, [review, measureOverflow]);
 
-    const resizeObserver =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(measureOverflow)
-        : null;
-
-    resizeObserver?.observe(textElement);
-
-    document.fonts?.ready.then(measureOverflow);
-
+  useEffect(() => {
     window.addEventListener("resize", measureOverflow);
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      resizeObserver?.disconnect();
       window.removeEventListener("resize", measureOverflow);
     };
-  }, [review]);
+  }, [measureOverflow]);
 
   return (
     <div className="review-card">
       <StarRating count={item.rating || 5} />
 
       <div className={`review-body${expanded ? " is-expanded" : ""}`}>
+        <p className={`review-text${!expanded ? " collapsed" : ""}`}>
+          "{review}"
+        </p>
         <p
-          ref={textRef}
-          className={`review-text${!expanded ? " collapsed" : ""}`}
+          ref={measureRef}
+          className="review-text review-text-measure collapsed"
+          aria-hidden="true"
         >
           "{review}"
         </p>
