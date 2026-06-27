@@ -266,6 +266,8 @@ table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  /* FIX: Forces the table to follow explicit column sizing and prevents text from blowing it up */
+  table-layout: fixed;
 }
 
 thead th {
@@ -279,6 +281,14 @@ thead th {
   border-bottom: 1px solid var(--color-border);
   background: rgba(3, 7, 18, 0.4);
 }
+
+/* FIX: Proportional column widths configuration to keep the dashboard stable */
+thead th:nth-child(1) { width: 18%; } /* Customer */
+thead th:nth-child(2) { width: 38%; } /* Review text */
+thead th:nth-child(3) { width: 12%; } /* Rating */
+thead th:nth-child(4) { width: 10%; } /* Status */
+thead th:nth-child(5) { width: 10%; } /* Date */
+thead th:nth-child(6) { width: 12%; } /* Actions */
 
 tbody td {
   padding: 20px 28px;
@@ -335,10 +345,15 @@ tbody tr:last-child td {
 }
 
 .review-text {
-  min-width: 280px;
-  max-width: 440px;
+  min-width: 200px;
+  max-width: 100%;
   color: #94a3b8;
   line-height: 1.6;
+  
+  /* FIX: Forces long strings without spaces to wrap neatly onto the next line */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .rating-stars {
