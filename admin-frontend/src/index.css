@@ -260,13 +260,13 @@ a:focus-visible {
 
 .table-responsive {
   width: 100%;
+  overflow-x: visible; /* Prevents container cutting */
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  /* FIX: Forces the table to follow explicit column sizing and prevents text from blowing it up */
   table-layout: fixed;
 }
 
@@ -277,25 +277,26 @@ thead th {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--color-text-muted);
-  padding: 18px 28px;
+  padding: 18px 24px; /* Slightly tightened padding */
   border-bottom: 1px solid var(--color-border);
   background: rgba(3, 7, 18, 0.4);
 }
 
-/* FIX: Proportional column widths configuration to keep the dashboard stable */
-thead th:nth-child(1) { width: 18%; } /* Customer */
-thead th:nth-child(2) { width: 38%; } /* Review text */
+/* UPDATED: Optimized column distribution to ensure Actions gets enough space */
+thead th:nth-child(1) { width: 15%; } /* Customer */
+thead th:nth-child(2) { width: 33%; } /* Review Text (Reduced to give actions breathable space) */
 thead th:nth-child(3) { width: 12%; } /* Rating */
 thead th:nth-child(4) { width: 10%; } /* Status */
 thead th:nth-child(5) { width: 10%; } /* Date */
-thead th:nth-child(6) { width: 12%; } /* Actions */
+thead th:nth-child(6) { width: 20%; } /* Actions (Increased from 12% to 20%) */
 
 tbody td {
-  padding: 20px 28px;
+  padding: 20px 24px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   font-size: 0.9rem;
   vertical-align: middle;
   color: var(--color-text);
+  overflow: visible; /* Keeps buttons visible */
 }
 
 tbody tr {
@@ -345,13 +346,11 @@ tbody tr:last-child td {
 }
 
 .review-text {
-  min-width: 200px;
+  min-width: 150px;
   max-width: 100%;
   color: #94a3b8;
   line-height: 1.6;
-  
-  /* FIX: Forces long strings without spaces to wrap neatly onto the next line */
-  word-break: break-word;
+  word-break: break-all; /* Perfectly forces break on solid continuous gibberish text */
   overflow-wrap: break-word;
   white-space: normal;
 }
@@ -371,7 +370,7 @@ tbody tr:last-child td {
 
 /* ---------- Standalone Premium Review Cards (Hidden on Desktop) ---------- */
 .mobile-reviews-grid {
-  display: none; /* Desktop par hidden */
+  display: none;
 }
 
 /* ---------- Fine-tuned Matte Badges ---------- */
@@ -393,15 +392,17 @@ tbody tr:last-child td {
 /* ---------- Action Systems ---------- */
 .actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .action-btn {
   border: 1px solid transparent;
-  padding: 8px 14px;
+  padding: 6px 10px; /* Snugger padding inside table */
   border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.75rem; /* Marginally downsized text for safety inside grid */
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s var(--ease-premium);
@@ -565,7 +566,7 @@ tbody tr:last-child td {
   margin: 0 0 8px 0;
 }
 
-/* ---------- Luxury Hidden-Until-Hover Scrollbars ---------- */
+/* ---------- Luxury Scrollbars ---------- */
 .table-responsive::-webkit-scrollbar,
 ::-webkit-scrollbar {
   width: 5px;
@@ -591,18 +592,10 @@ body:hover::-webkit-scrollbar-thumb {
   background: rgba(99, 102, 241, 0.2);
 }
 
-.table-responsive::-webkit-scrollbar-thumb:hover,
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(124, 58, 237, 0.45) !important;
-}
-
 @supports (scrollbar-width: thin) {
   html, .table-responsive {
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.02) transparent;
-  }
-  html:hover, .table-responsive:hover {
-    scrollbar-color: rgba(99, 102, 241, 0.2) transparent;
   }
 }
 
@@ -632,7 +625,6 @@ body:hover::-webkit-scrollbar-thumb {
     width: 100%;
     overflow-x: auto;
     white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
   }
   .filter-tab {
     flex: 1;
@@ -643,19 +635,17 @@ body:hover::-webkit-scrollbar-thumb {
     font-size: 2rem;
   }
 
-  /* --- Pivot Core Logic: Table Hide, Cards Show --- */
   .table-card {
-    display: none; /* Mobile par structural table complete hidden */
+    display: none;
   }
 
   .mobile-reviews-grid {
-    display: grid; /* Review cards dynamic block trigger */
+    display: grid;
     grid-template-columns: 1fr;
     gap: 16px;
     width: 100%;
   }
 
-  /* Single Review Card Design */
   .review-mobile-card {
     background: var(--color-surface-solid);
     border: 1px solid var(--color-border);
@@ -664,7 +654,6 @@ body:hover::-webkit-scrollbar-thumb {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   }
 
   .mobile-card-header {
@@ -696,7 +685,7 @@ body:hover::-webkit-scrollbar-thumb {
   }
   
   .mobile-card-actions .action-btn {
-    flex: 1; /* Equal proportional button spacing */
+    flex: 1;
     text-align: center;
     padding: 10px;
   }
