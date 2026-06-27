@@ -78,7 +78,7 @@ const Dashboard = () => {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <h1>Review Admin Dashboard</h1>
+        <h1>NexoraLeads</h1>
         <div style={{ display: "flex", alignItems: "center" }}>
           {admin?.email && <span className="admin-email">{admin.email}</span>}
           <button className="logout-btn" onClick={logout}>
