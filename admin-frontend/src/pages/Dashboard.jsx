@@ -12,21 +12,26 @@ const Dashboard = () => {
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState(null);
 
-  const { admin, logout } = useAuth();
+  // Added 'loadingAuth' or 'loading' state check from useAuth context if available.
+  // Agar aapke AuthContext mein loading variable ka naam alag hai (e.g. isCheckingAuth), toh usay use karein.
+  const { admin, logout, loading: loadingAuth } = useAuth();
 
   const fetchReviews = useCallback(async () => {
+    // Prevent fetching if admin is not yet loaded during refresh bypass
+    if (!admin) return;
+
     setLoading(true);
     setError("");
     try {
       const params = filter !== "all" ? { status: filter } : {};
       const response = await api.get("/admin/reviews", { params });
-      setReviews(response.data.data);
+      setReviews(response.data.data || []);
     } catch (err) {
       setError("Could not load reviews. Please try again.");
     } finally {
       setLoading(false);
     }
-  }, [filter]);
+  }, [filter, admin]);
 
   useEffect(() => {
     fetchReviews();
@@ -90,12 +95,22 @@ const Dashboard = () => {
     }
   };
 
+  // 1. CRITICAL GUARD: If Auth is fetching state, show global loading instead of running broken renders
+  if (loadingAuth) {
+    return <div className="loading-state">Verifying session...</div>;
+  }
+
+  // 2. SAFETY GUARD: If refresh finishes and context determines no admin exists, prevent reading .email properties
+  if (!admin) {
+    return <div className="loading-state">Redirecting or unauthorized access...</div>;
+  }
+
   return (
     <div className="app-shell">
       <header className="topbar">
         <h1>NexoraLeads</h1>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          {admin?.email && <span className="admin-email">{admin.email}</span>}
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {admin && admin.email && <span className="admin-email">{admin.email}</span>}
           <button className="logout-btn" onClick={logout}>
             Log out
           </button>
@@ -143,7 +158,6 @@ const Dashboard = () => {
             {/* 2. Mobile Cards Grid View */}
             <div className="mobile-reviews-grid">
               {reviews.map((review) => {
-                // Dynamic debugging directly on mobile UI safe guard
                 const reviewContent = review.comment || review.text || review.review || review.message || "No content provided";
                 const reviewerName = review.name || review.username || review.reviewer || "Anonymous";
                 
@@ -167,7 +181,7 @@ const Dashboard = () => {
 
                     {/* Body: Review Text Content */}
                     <div className="mobile-card-body">
-                      <div className="review-text" style={{ wordBreak: "break-word" }}>
+                      <div className="review-text">
                         {reviewContent}
                       </div>
                     </div>
