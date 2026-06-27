@@ -630,63 +630,65 @@ body:hover::-webkit-scrollbar-thumb {
 
   /* --- Pivot Core Logic: Table Hide, Cards Show --- */
   .table-card {
-    display: none; /* Mobile par structural table complete hidden */
+    display: none !important;
   }
 
+  /* 2. Mobile Grid ko instantly active karo */
   .mobile-reviews-grid {
-    display: grid; /* Review cards dynamic block trigger */
-    grid-template-columns: 1fr;
-    gap: 16px;
-    width: 100%;
+    display: grid !important; 
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    width: 100% !important;
+    padding-bottom: 24px;
   }
 
-  /* Single Review Card Design */
+  /* 3. Card Elements Styling Insurance */
   .review-mobile-card {
-    background: var(--color-surface-solid);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    background: var(--color-surface-solid, #0b0f19) !important;
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.05)) !important;
+    border-radius: var(--radius-md, 12px) !important;
+    padding: 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
   }
 
   .mobile-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
   }
 
   .mobile-card-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    padding: 10px 0;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+    padding: 10px 0 !important;
   }
 
   .mobile-card-body .review-text {
-    max-width: 100%;
-    min-width: unset;
-    font-size: 0.9rem;
+    max-width: 100% !important;
+    min-width: unset !important;
+    font-size: 0.9rem !important;
+    color: #94a3b8 !important;
   }
 
   .mobile-card-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    padding-top: 4px;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    padding-top: 4px !important;
   }
   
   .mobile-card-actions .action-btn {
-    flex: 1; /* Equal proportional button spacing */
-    text-align: center;
-    padding: 10px;
+    flex: 1 !important;
+    text-align: center !important;
+    padding: 10px !important;
   }
 }
-
 @media (max-width: 480px) {
   .login-card {
     padding: 36px 24px;
