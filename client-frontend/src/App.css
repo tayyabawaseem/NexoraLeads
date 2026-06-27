@@ -1570,15 +1570,15 @@ body {
 }
 
 /* =========================
-   SLIDER (Equal Height Fix)
+   SLIDER (Equal Height Force Fix)
 ========================= */
 .reviews-slider {
-  margin-top: 70px;
+  margin-top: 50px;
 }
 
 .slide-wrapper {
   padding: 15px;
-  height: 100%; /* Ensures wrapper takes full slider height */
+  height: 100%;
 }
 
 .slick-list {
@@ -1586,7 +1586,8 @@ body {
 }
 
 .slick-track {
-  display: flex !important; /* Forces all slides to have equal height natively */
+  display: flex !important;
+  align-items: stretch !important; /* Forces all cards to have the exact same height */
 }
 
 .slick-slide {
@@ -1596,27 +1597,29 @@ body {
 }
 
 .slick-slide > div {
-  display: flex;
+  display: flex !important;
   flex-grow: 1;
-  height: 100%;
 }
 
 /* =========================
-   CARD (No Fixed Height, No Extra White Space)
+   CARD (No Fixed Height & Compact Design)
 ========================= */
 .review-card {
   position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 32px;
-  border-radius: 28px;
+  
+  display: flex !important;
+  flex-direction: column !important;
+  
+  padding: 28px; 
+  border-radius: 24px;
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, .08);
   overflow: hidden;
   transition: all .35s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 35px rgba(0, 0, 0, .05);
-  flex-grow: 1; /* Automatically stretches to match the tallest card */
+  
+  flex-grow: 1;
 }
 
 .review-card::before {
@@ -1646,7 +1649,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   color: #fbbf24;
   font-size: 14px;
   position: relative;
@@ -1654,23 +1657,26 @@ body {
 }
 
 /* =========================
-   REVIEW TEXT
+   REVIEW TEXT (No White Space Gaps)
 ========================= */
 .review-text {
   position: relative;
   z-index: 2;
-  margin: 0 0 24px 0; /* Margin bottom builds natural spacing to client info */
+  margin: 0 0 15px 0;
   color: var(--secondary);
   font-size: 15px;
-  line-height: 1.9;
-  flex-grow: 1; /* Pushes client-info down neatly without rigid white space */
+  line-height: 1.8;
+  
+  flex-grow: 0; /* Prevents low-text cards from forcing huge blank spaces */
+  
   white-space: normal;
   word-wrap: break-word;
   overflow-wrap: break-word;
   word-break: break-word;
   overflow: hidden;
+  
   display: -webkit-box;
-  -webkit-line-clamp: 6;
+  -webkit-line-clamp: 5; /* Controlled text length */
   -webkit-box-orient: vertical;
 }
 
@@ -1681,21 +1687,21 @@ body {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-top: auto; /* Always sits perfectly at the bottom of the card */
+  margin-top: 15px; /* Sits naturally below the text instead of flying to the bottom */
   position: relative;
   z-index: 2;
 }
 
 .avatar {
-  width: 58px;
-  height: 58px;
-  border-radius: 18px;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
   background: var(--btn-gradient);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   flex-shrink: 0;
   overflow: hidden;
@@ -1743,7 +1749,7 @@ body {
 }
 
 /* =========================
-   RESPONSIVE (Cleaned & Organized)
+   RESPONSIVE (Clean & Optimized)
 ========================= */
 @media (max-width: 992px) {
   .reviews-section {
@@ -1765,7 +1771,7 @@ body {
   }
 
   .slide-wrapper {
-    padding: 8px; /* Less spacing on mobile screens */
+    padding: 8px;
   }
 
   .review-card {
@@ -1774,9 +1780,9 @@ body {
   }
 
   .avatar {
-    width: 50px;
-    height: 50px;
-    font-size: 18px;
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
   }
 
   .client-info h4 {
